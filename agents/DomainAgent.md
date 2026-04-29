@@ -181,4 +181,5 @@ title: <페이지 제목>          # 본문 H1
 - `superpowers:verification-before-completion`: "지식 공백" 섹션 누락 여부 점검
 
 ## 문서화 표준
-`docs/domain-knowledge/**` 직접 write 가능 (CFP-26 Phase 0a, schema [`templates/domain-knowledge.md`](../templates/domain-knowledge.md) CFP-27). GitHub Issue/PR/comment 및 그 외 docs write 권한 없음. 도메인 지식 외 문서화는 Orchestrator 경유 DocsAgent가 기록 (write queue 경유). 문서화 표준은 [DocsAgent.md](DocsAgent.md) 참조.
+
+본 agent 는 자기 lane 의 self-write 표 (codeforge-requirements `CLAUDE.md` `Self-write 책임` 표) 가 정의하는 path 만 직접 write. 그 외 docs/** + GitHub Issue/PR 인터페이스는 codeforge wrapper Orchestrator 가 처리. 형식·prefix 표는 wrapper [CLAUDE.md](https://github.com/mclayer/plugin-codeforge/blob/main/CLAUDE.md) "오케스트레이션 규칙" 참조.
