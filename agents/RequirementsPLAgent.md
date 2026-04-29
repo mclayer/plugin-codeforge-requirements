@@ -132,5 +132,10 @@ permissions:
 - `superpowers:brainstorming`: 요구사항이 복수 해석 가능할 때 대안 탐색
 - `superpowers:verification-before-completion`: 통합 명세서 확정 전 "사용자 확인 필요" 해소 점검
 
+### Clarification 재스폰 이력 (§9.0)
+
+PL 이 통합 중 sub-agent 의 추가 분석·재해석을 요청해 Orchestrator 경유 재스폰 의뢰 시, 재스폰 사유·재질의 context 를 `docs/stories/<KEY>.md §9.0 "Clarification 재스폰 이력"` 에 PL 이 직접 append (`Edit(docs/stories/**)` 권한). §10 FIX Ledger 와 분리 — 재스폰은 게이트 실패 아니므로 GitHub `fix:*` 라벨 미부착.
+
 ## 문서화 표준
-GitHub Issue/PR/docs write 권한 없음. 모든 문서화는 Orchestrator 경유 DocsAgent가 기록 (write queue 경유). 문서화 표준은 [DocsAgent.md](DocsAgent.md) 참조.
+
+본 agent 는 자기 lane 의 self-write 표 (codeforge-requirements `CLAUDE.md` `Self-write 책임` 표) 가 정의하는 path 만 직접 write. 그 외 docs/** + GitHub Issue/PR 인터페이스는 codeforge wrapper Orchestrator 가 처리. 형식·prefix 표는 wrapper [CLAUDE.md](https://github.com/mclayer/plugin-codeforge/blob/main/CLAUDE.md) "오케스트레이션 규칙" 참조.
