@@ -59,7 +59,7 @@ PL 이 한 메시지에 3 sub-agent 동시 dispatch (사용자 원문 verbatim S
 title: <표시용 제목>
 area: <area 이름>
 topic_slug: <kebab-case topic>
-status: Draft | Active | Deprecated
+status: draft | active | deprecated
 sources:
   - <file path or URL>
 related_adrs:
@@ -78,4 +78,4 @@ updated: YYYY-MM-DD
 - `## 관련 ADR`
 - `## 변경 이력`
 
-**검증**: `scripts/check-doc-frontmatter.sh` + `scripts/check-doc-section-schema.sh` (warning 모드 — CFP-28 strict 전환 후 fail).
+**검증**: wrapper repo (mclayer/plugin-codeforge) 의 `scripts/check-doc-frontmatter.sh` + `scripts/check-doc-section-schema.sh` (warning 모드 — CFP-28 strict 전환 후 fail).
