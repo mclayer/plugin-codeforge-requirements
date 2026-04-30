@@ -79,3 +79,12 @@ updated: YYYY-MM-DD
 - `## 변경 이력`
 
 **검증**: wrapper repo (mclayer/plugin-codeforge) 의 `scripts/check-doc-frontmatter.sh` + `scripts/check-doc-section-schema.sh` (warning 모드 — CFP-28 strict 전환 후 fail).
+
+## Dogfood policy (CFP-45)
+
+본 plugin repo 는 runtime SSOT 만 보유. dogfood artifacts (specs/plans/retros/stories/change-plans) 는 [`mclayer/codeforge-internal-docs`](https://github.com/mclayer/codeforge-internal-docs) 단일 monorepo SSOT. 본 plugin 폴더는 `codeforge-internal-docs/requirements/`. 상세 정책 + Story workflow 흐름은 wrapper [CLAUDE.md](https://github.com/mclayer/plugin-codeforge/blob/main/CLAUDE.md) canonical SSOT 참조 + [ADR-013](https://github.com/mclayer/plugin-codeforge/blob/main/docs/adr/ADR-013-codeforge-family-dogfood-out-policy.md) (PR-I 머지 후 Adopted).
+
+Plugin repo 측 GitHub Issue 와 internal-docs 측 Story file 의 binding:
+- Issue body frontmatter: `story_uri: <internal-docs URL>`
+- Story file frontmatter: `story_issues: [{repo: "mclayer/plugin-codeforge-requirements", number: <N>}]`
+- `.github/workflows/phase-gate-mergeable.yml` (본 repo) 가 cross-repo Story fetch via GitHub App
