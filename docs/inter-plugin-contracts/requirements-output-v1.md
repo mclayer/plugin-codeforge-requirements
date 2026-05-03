@@ -111,6 +111,38 @@ requirements_output:
       blocking: <bool>
 ```
 
+## 3.1 Story §1 frontmatter schema (cross-repo Epic 지원, v1.1)
+
+CFP-60 / [ADR-020](../adr/ADR-020-cross-repo-epic-pattern.md) 신설. Story `§1 메타` 의 YAML frontmatter 에 cross-repo Epic 정보 추가 (optional, backward compatible).
+
+```yaml
+---
+key: <KEY>           # required (예: CFP-60)
+title: <string>      # required
+status: <phase:*>    # required
+date: <ISO8601>      # required
+type: story          # required
+github_issue: <owner/repo#N>  # required
+
+# Cross-repo Epic 지원 (v1.1, ADR-020 / CFP-60)
+epic_owner_repo: <owner/repo> | null  # OPTIONAL — null if single-repo Story
+epic_dependencies:                    # OPTIONAL — empty list if independent
+  - type: hard_block | design_parallel | impl_parallel
+    target: <KEY>
+    repo: <owner/repo>
+---
+```
+
+**Type 정의**:
+- `hard_block`: blocking dependency — target merge 전 본 Story 작업 불가
+- `design_parallel`: 설계 동시 진행 가능 (구현은 target 후)
+- `impl_parallel`: 구현 동시 진행 가능 (target merge 와 무관)
+
+**Backward compatibility**:
+- Pre-v1.1 Story (CFP-1 ~ CFP-59) 는 `epic_dependencies` / `epic_owner_repo` field 없이 작성됨
+- v1.1 consumer 가 default `[]` / `null` 로 처리
+- 기존 Story 영향 X — 신규 Story 만 optional 사용
+
 ## 4. ESCALATE 처리
 
 - **ESCALATE_USER_CLARIFICATION**: Analyst 가 user 원문 ambiguity 해결 불가. PL 이 specific 질문 list 반환 → Orchestrator 가 user 에게 전달
