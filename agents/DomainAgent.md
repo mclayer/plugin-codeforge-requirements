@@ -177,8 +177,11 @@ title: <페이지 제목>          # 본문 H1
 - **직접 subagent 스폰 불가** — RequirementsPLAgent/Orchestrator 경유
 
 ## 스킬
-- `superpowers:brainstorming`: 요구사항이 복수 해석 가능할 때 도메인 관점 대안 도출
-- `superpowers:verification-before-completion`: "지식 공백" 섹션 누락 여부 점검
+
+호출 skill SSOT = wrapper [`docs/superpowers-integration.md §2`](https://github.com/mclayer/plugin-codeforge/blob/main/docs/superpowers-integration.md) row `requirements/DomainAgent` 참조 (정책 재정의 X, link only per [ADR-028](https://github.com/mclayer/plugin-codeforge/blob/main/docs/adr/ADR-028-superpowers-integration-policy.md) §결정 1):
+
+- `superpowers:brainstorming` — 요구사항 대안 탐색 (도메인 관점)
+- `superpowers:verification-before-completion` — "지식 공백" 섹션 점검
 
 ## 문서화 표준
 

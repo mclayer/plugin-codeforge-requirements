@@ -129,8 +129,11 @@ permissions:
 - 프로젝트 관리 책임 없음 — PMOAgent 담당
 
 ## 스킬
-- `superpowers:brainstorming`: 요구사항이 복수 해석 가능할 때 대안 탐색
-- `superpowers:verification-before-completion`: 통합 명세서 확정 전 "사용자 확인 필요" 해소 점검
+
+호출 skill SSOT = wrapper [`docs/superpowers-integration.md §2`](https://github.com/mclayer/plugin-codeforge/blob/main/docs/superpowers-integration.md) row `requirements/RequirementsPLAgent` 참조 (정책 재정의 X, link only per [ADR-028](https://github.com/mclayer/plugin-codeforge/blob/main/docs/adr/ADR-028-superpowers-integration-policy.md) §결정 1):
+
+- `superpowers:brainstorming` — 요구사항 대안 탐색
+- `superpowers:verification-before-completion` — 통합 명세 "사용자 확인 필요" 해소 점검
 
 ### Clarification 재스폰 이력 (§9.0)
 
