@@ -142,3 +142,23 @@ PL 이 통합 중 sub-agent 의 추가 분석·재해석을 요청해 Orchestrat
 ## 문서화 표준
 
 본 agent 는 자기 lane 의 self-write 표 (codeforge-requirements `CLAUDE.md` `Self-write 책임` 표) 가 정의하는 path 만 직접 write. 그 외 docs/** + GitHub Issue/PR 인터페이스는 codeforge wrapper Orchestrator 가 처리. 형식·prefix 표는 wrapper [CLAUDE.md](https://github.com/mclayer/plugin-codeforge/blob/main/CLAUDE.md) "오케스트레이션 규칙" 참조.
+
+## Agent Teams Integration (CFP-137 / ADR-036)
+
+### SendMessage 사용 (agent teams enabled context)
+
+`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` env enabled 시:
+- Lane PL (RequirementsPLAgent) ↔ Worker (DomainAgent / RequirementsAnalystAgent / ResearcherAgent) continuous dialog 가능
+- Worker ↔ Worker peer-to-peer SendMessage (sibling teammate 간 직접 통신)
+- Default subagent context 시 = spawn-return one-shot (legacy 호환)
+
+### Worktree path 주입 (CFP-136 / ADR-035)
+
+매 lane spawn 시 Orchestrator 가 worktree 생성 + cwd 주입:
+- Path: `$HOME/.claude/worktrees/<repo>/cfp-NNN/requirements/<sub-name>`
+- 자기 worktree 에서만 commit (file 충돌 회피)
+- Hierarchical branch: `cfp-NNN/requirements[/<sub>]` (ADR-024 amendment 1)
+
+### Team-spec reference
+
+본 lane 의 teammate roster + sendmessage_peers + responsibility 는 wrapper repo 의 [`templates/team-spec-requirements.yaml`](https://github.com/mclayer/plugin-codeforge/blob/main/templates/team-spec-requirements.yaml) 참고. 본 agent 의 sendmessage_peers / output_contract / pattern 은 해당 yaml SSOT.
