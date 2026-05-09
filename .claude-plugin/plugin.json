@@ -1,7 +1,7 @@
 {
   "name": "codeforge-requirements",
-  "version": "0.1.0",
-  "description": "codeforge ζ arc Requirements lane plugin (CFP-37) — RequirementsPLAgent (synthesizer) + DomainAgent (도메인 KB direct write) + RequirementsAnalystAgent (codex exec wrapper) + ResearcherAgent (외부 지식 리서치). 4 sub-agent 병렬 스폰 → PL 통합. Domain Knowledge + Story §2/§5/§6 self-write. codeforge core 의존.",
+  "version": "0.2.0",
+  "description": "codeforge ζ arc Requirements lane plugin (CFP-37) — RequirementsPLAgent (synthesizer) + DomainAgent (도메인 KB direct write) + RequirementsAnalystAgent (ambiguity-driven reshape) + ResearcherAgent (Concept formulation + Deep exploration + Requirement reshape — concept-driven). 4-way 병렬 관점 통합으로 요구사항 명세서 생성. Domain Knowledge + Story §2/§5/§6 self-write. codeforge core 의존.",
   "author": {
     "name": "Josh"
   },
