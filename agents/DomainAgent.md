@@ -172,7 +172,7 @@ title: <페이지 제목>          # 본문 H1
 
 ## 제약
 - **WebSearch/WebFetch 금지** — 외부 조사는 Researcher 전담
-- **Write/Edit 금지** (`docs/domain-knowledge/**` + write queue 제외) — 그 외 docs 기록은 DocsAgent 경유. GitHub Discussions Q&A는 multi-actor 채널이므로 DocsAgent 유지
+- **Write/Edit 금지** (`docs/domain-knowledge/**` 제외) — 그 외 docs 기록 write 금지
 - **설계·구현 판단 금지** — 도메인 해석만, 설계는 Architect 영역
 - **직접 subagent 스폰 불가** — RequirementsPLAgent/Orchestrator 경유
 

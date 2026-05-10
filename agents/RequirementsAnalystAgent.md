@@ -45,7 +45,7 @@ permissions:
 
 ## 입력 컨텍스트 구성 (RequirementsPLAgent가 준비해 전달 — 공통 입력 패키지)
 
-**주 입력**: `docs/stories/<KEY>.md` (Story file, Orchestrator가 요구사항 접수 시 story-init.yml Action 또는 DocsAgent 경유 생성). 파일 생성 시점에 §1(사용자 원문)만 verbatim 채워진 상태 — §2(Domain)·§5(Analyst 본인)·§6(Researcher)는 모두 placeholder (세 에이전트 병렬 실행 결과로 동시 기록될 예정).
+**주 입력**: `docs/stories/<KEY>.md` (Story file, Orchestrator가 요구사항 접수 시 story-init.yml Action 으로 자동 생성). 파일 생성 시점에 §1(사용자 원문)만 verbatim 채워진 상태 — §2(Domain)·§5(Analyst 본인)·§6(Researcher)는 모두 placeholder (세 에이전트 병렬 실행 결과로 동시 기록될 예정).
 
 프롬프트 포함 (DomainAgent·Researcher와 공통 — 타 에이전트 산출물 제외):
 1. **Story file 경로** — `Read(docs/stories/<KEY>.md)`로 §1 fetch

@@ -20,7 +20,7 @@ permissions:
     - Write(docs/**)
 ---
 
-**요구사항 레인의 PL**. Orchestrator가 사용자 요건 접수 후 GitHub Issue (Story) + `docs/stories/<KEY>.md` (Story file, story-init.yml Action 자동 생성) 초기화를 마치면 본 에이전트를 스폰한다. 도메인 해석(DomainAgent), 요구사항 확장(RequirementsAnalyst), 외부 기술·선행사례 리서치(Researcher)를 **병렬 활용** — 셋 모두 공통 입력에서 독립 관점으로 분석 → PL이 세 결과를 dedup·상충 조정해 통합 요구사항 명세서를 작성하고, DocsAgent 경유(write queue)로 Story file §3-6에 반영한다. ArchitectAgent 설계 진입은 이 파일이 단일 입력.
+**요구사항 레인의 PL**. Orchestrator가 사용자 요건 접수 후 GitHub Issue (Story) + `docs/stories/<KEY>.md` (Story file, story-init.yml Action 자동 생성) 초기화를 마치면 본 에이전트를 스폰한다. 도메인 해석(DomainAgent), 요구사항 확장(RequirementsAnalyst), 외부 기술·선행사례 리서치(Researcher)를 **병렬 활용** — 셋 모두 공통 입력에서 독립 관점으로 분석 → PL이 세 결과를 dedup·상충 조정해 통합 요구사항 명세서를 작성하고, Story file §2·§5·§6에 직접 반영한다. ArchitectAgent 설계 진입은 이 파일이 단일 입력.
 
 본 에이전트는 구 PMOAgent의 **요구사항 레인 PL 책임을 단독 계승**. PMOAgent는 프로젝트 관리 전담으로 재스코프됨.
 
@@ -65,20 +65,19 @@ permissions:
    · Orchestrator가 해당 에이전트 신규 스폰 (one-shot 제약상 재스폰이 유일한 continuous-dialog 대체)
    · 재스폰 결과 수령 후 3단계(통합) 반복
 
-5. PL 통합 산출물 결정 (PL이 직접 write 하는 것은 §3-4 + 상충/정합 분석만)
-   · §2 (Domain 해석) — DomainAgent가 자체 queue 제출 (atomic per-agent, resume 부분 완료 감지 보장)
-   · §5 (Analyst 확장) — RequirementsAnalyst가 자체 queue 제출
-   · §6 (Researcher 외부 지식) — Researcher가 자체 queue 제출
-   · §3 관련 ADR / §4 관련 코드 경로 / 상충 정합 분석 → PL이 queue 제출
+5. PL 통합 산출물 결정
+   · §2 (Domain 해석 통합 + 상충 조정) — RequirementsPLAgent가 직접 write
+   · §5 (Analyst 확장) — RequirementsAnalystAgent가 직접 write
+   · §6 (Researcher 외부 지식) — ResearcherAgent가 직접 write
+   · §3 관련 ADR / §4 관련 코드 경로 / 상충 정합 분석 → RequirementsPLAgent가 직접 write
    · "사용자 확인 필요" 항목은 blocking wait — Orchestrator 경유 사용자 답변 전 Architect 진입 금지
 
-6. DocsAgent 경유 write queue에 PL 산출물 의뢰 — 큐 파일 스키마는 [docs/orchestrator-playbook.md](../docs/orchestrator-playbook.md) §11.2 SSOT
-   · `.claude-work/doc-queue/<story>/<seq>-story-section-3.md` (§3 관련 ADR; frontmatter `section: "3"`)
-   · `.claude-work/doc-queue/<story>/<seq>-story-section-4.md` (§4 관련 코드 경로; frontmatter `section: "4"`)
-   · 양쪽 모두 frontmatter: `type: story-section / story: <KEY> / requester: RequirementsPLAgent / issued_at: <ISO 8601> / priority: normal`
-   · 세 sub-agent의 queue 파일은 각자 독립 제출 — PL은 sub-agent 산출물을 다시 묶어 제출하지 않음
-   · 통합 분석(상충 조정) 결과는 Orchestrator에 inline 반환 (Story file 누적 대상이 아니면 queue 의뢰 없음)
-   · Orchestrator가 DocsAgent 스폰 시 일괄 drain (atomic 섹션별 Edit)
+6. PL 산출물을 Story file에 직접 반영
+   · Story §2 (Domain 해석 통합 + 상충 조정 분석) — RequirementsPLAgent 직접 write
+   · Story §5 (Analyst 확장) — RequirementsAnalystAgent 직접 write
+   · Story §6 (Researcher 외부 지식) — ResearcherAgent 직접 write
+   · Story §3·§4 관련 ADR·코드 경로 — RequirementsPLAgent 직접 write
+   · 통합 분석(상충 조정) 결과는 Orchestrator에 inline 반환 (Story file 누적 대상이 아니면 write 불필요)
 ```
 
 ## 통합 명세서 (docs/stories/<KEY>.md (Story file) 섹션 매핑)

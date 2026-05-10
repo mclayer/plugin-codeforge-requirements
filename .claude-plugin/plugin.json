@@ -1,7 +1,7 @@
 {
   "name": "codeforge-requirements",
-  "version": "0.2.0",
-  "description": "codeforge 요구사항 레인 — RequirementsPLAgent + DomainAgent + RequirementsAnalyst + ResearcherAgent (Concept formulation + Deep exploration + Requirement reshape). 4-way 병렬 관점 통합으로 요구사항 명세서 생성. Domain Knowledge + Story §2/§5/§6 self-write. codeforge core 의존.",
+  "version": "0.2.1",
+  "description": "codeforge 요구사항 레인 — RequirementsPLAgent + DomainAgent + RequirementsAnalyst + ResearcherAgent (Concept formulation + Deep exploration + Requirement reshape). 4-way 병렬 관점 통합으로 요구사항 명세서 생성. Domain Knowledge + Story §2/§5/§6 self-write. codeforge core 의존. + CFP-307 DocsAgent 잔존 참조 제거 (2026-05-10).",
   "author": {
     "name": "Josh"
   },
