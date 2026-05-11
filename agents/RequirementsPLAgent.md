@@ -47,14 +47,19 @@ permissions:
    · 관련 ADR 목록 (`docs/adr/ADR-NNN-<slug>.md` 경로 + 1줄 요약)
    · 이전 스레드 합의 (있을 경우)
 
-2. 세 에이전트 병렬 스폰 의뢰 (Orchestrator에 "동시 스폰" 요청)
-   · DomainAgent      — 도메인 지식 공백 관점 키워드 자체 도출
+2. 여섯 에이전트 병렬 스폰 의뢰 (Orchestrator에 "동시 스폰" 요청)
+   · DomainAgent           — 도메인 지식 공백 관점 키워드 자체 도출
    · RequirementsAnalystAgent — 요구사항 ambiguity 관점 (암묵 가정·AC·엣지) 자체 도출
-   · ResearcherAgent  — 외부 기술·선행사례 관점 키워드 자체 도출
-   · 셋 모두 공통 입력만 수신. 타 에이전트 산출물 전달 금지 (독립성 보장)
+   · ResearcherAgent       — 외부 기술·선행사례 관점 키워드 자체 도출
+   · ChangeImpactAgent     — src/** 코드 변경 델타 지도 (§4.1)
+   · FeasibilityAgent      — 아키텍처 구현 가능성 평가 (§4.2)
+   · ContinuityAgent       — 이전 Story/ADR 연속성 분석 (§4.3)
+   · 여섯 모두 공통 입력만 수신. 타 에이전트 산출물 전달 금지 (독립성 보장)
    · "null 결과" (해당 관점 조사 불필요) 반환도 유효 — skip 금지
 
-3. 세 결과 수령 후 통합 (본 에이전트 핵심 책임)
+3. 여섯 결과 수령 후 통합 (본 에이전트 핵심 책임)
+   · FeasibilityAgent §4.2의 ADR 충돌 후보 → §3 "관련 ADR" 목록에 반영
+   · ContinuityAgent §4.3의 재논의 필요 항목 → §3 충돌 ADR 확인
    · Dedup: 같은 사실·관심사를 세 에이전트가 중복 언급 시 1건 병합
    · 상충 조정: 세 관점이 다른 결론을 제시하면 근거 비교 후 판정 (불가하면 사용자 ESCALATE)
    · 공백 식별: 세 관점 모두 커버하지 못한 영역 발견 시 clarification 재스폰 또는 사용자 질의
@@ -86,7 +91,10 @@ permissions:
 |------------------|-------------------|
 | 사용자 원문 (verbatim) | §1 (Orchestrator가 Story file 생성 시 초기화) |
 | DomainAgent 도메인 해석 | §2 |
-| 관련 ADR / 관련 코드 경로 | §3 / §4 |
+| 관련 ADR / 관련 코드 경로 목록 | §3 / §4.0 |
+| 코드 변경 델타 지도 (ChangeImpactAgent) | §4.1 |
+| 구현 가능성 평가 (FeasibilityAgent) | §4.2 |
+| 이전 작업 연속성 분석 (ContinuityAgent) | §4.3 |
 | 요구사항 확장 해석 (Analyst) | §5 |
 | 사용자 확인 필요 | §5.5 |
 | 도메인 배경지식 (Researcher) | §6 |
