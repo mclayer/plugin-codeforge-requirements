@@ -61,17 +61,31 @@ PL 이 한 메시지에 3 sub-agent 동시 dispatch (사용자 원문 verbatim S
 
 **적용 lane**: 요구사항 (3 sub-agent) · 설계 (5 deputy) 양쪽 동일 패턴 — wrapper Orchestrator 가 routing.
 
-## Domain Knowledge page schema
+## Domain Knowledge page schema (ADR-056 기준)
 
-- **위치**: `docs/domain-knowledge/<area>/<topic>.md` (계층 구조). Consumer overlay 가 area 자유 정의
+`docs/domain-knowledge/` 하위 두 서브디렉터리로 소유 경계가 물리 분리됨:
+
+### domain/ (DomainAgent 전용)
+
+- **위치**: `docs/domain-knowledge/domain/<area>/<topic>.md` (area는 consumer overlay 자유 정의)
 - **owner write**: DomainAgent 직접 (CFP-26 Phase 0a 후 wrapper write queue 미경유)
-- **CODEOWNERS**: `docs/domain-knowledge/**` → `@org/domain-experts` 자동 review
-- **template**: [`templates/domain-knowledge.md`](templates/domain-knowledge.md) (CFP-27 신설)
+- **CODEOWNERS**: `docs/domain-knowledge/domain/**` → `@org/domain-experts` 자동 review
+- **template**: [`templates/domain-knowledge.md`](templates/domain-knowledge.md)
+- **frontmatter kind**: `kind: domain_fact` (필수)
 
-**Schema** (frontmatter + 본문 sections):
+### concept/ (ResearcherAgent 전용)
+
+- **위치**: `docs/domain-knowledge/concept/<slug>.md` (kebab-case slug)
+- **owner write**: ResearcherAgent 직접 (ADR-056 신설)
+- **CODEOWNERS**: `docs/domain-knowledge/concept/**` → `@org/researchers` 자동 review
+- **template**: [`templates/concept-knowledge.md`](templates/concept-knowledge.md) (ADR-056 신설)
+- **frontmatter kind**: `kind: concept_definition` (필수)
+
+**Schema (domain/ 파일 — DomainAgent)**:
 
 ```yaml
 ---
+kind: domain_fact
 title: <표시용 제목>
 area: <area 이름>
 topic_slug: <kebab-case topic>
@@ -86,6 +100,22 @@ updated: YYYY-MM-DD
 ---
 ```
 
+**Schema (concept/ 파일 — ResearcherAgent)**:
+
+```yaml
+---
+kind: concept_definition
+title: <표시용 제목>
+slug: <kebab-case slug>
+status: draft | active | deprecated
+external_sources:
+  - <URL or publication>
+related_adrs: []
+related_stories: []
+updated: YYYY-MM-DD
+---
+```
+
 본문 섹션:
 - `## 정의`
 - `## 컨텍스트`
@@ -94,7 +124,7 @@ updated: YYYY-MM-DD
 - `## 관련 ADR`
 - `## 변경 이력`
 
-**검증**: wrapper repo (mclayer/plugin-codeforge) 의 `scripts/check-doc-frontmatter.sh` + `scripts/check-doc-section-schema.sh` (warning 모드 — CFP-28 strict 전환 후 fail).
+**검증**: wrapper repo (mclayer/plugin-codeforge) 의 `scripts/check-doc-frontmatter.sh` — `domain/` 필드(kind·title·area·topic_slug·status·updated)와 `concept/` 필드(kind·title·slug·status·updated) 경로별 분기 검증 (ADR-056, warning 모드 — CFP-28 strict 전환 후 fail). `scripts/check-doc-section-schema.sh` 병행.
 
 ## Dogfood policy (CFP-45)
 

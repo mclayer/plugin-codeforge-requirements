@@ -57,27 +57,36 @@ permissions:
    · 여섯 모두 공통 입력만 수신. 타 에이전트 산출물 전달 금지 (독립성 보장)
    · "null 결과" (해당 관점 조사 불필요) 반환도 유효 — skip 금지
 
-3. 여섯 결과 수령 후 통합 (본 에이전트 핵심 책임)
+3. 세 결과 수령 후 **합성 순서** 준수 (ADR-056 §결정 3)
+   합성은 아래 순서로 수행 — 병렬 스폰 순서와 무관:
+   (a) §5 Analyst 먼저 — 모호성 목록 확정, 언어적 불확실성 해소
+   (b) §2 Domain — 내부 제약 적용, 시스템 경계 확인
+   (c) §6 Researcher — 외부 개념으로 용어 disambiguation (§6 Section 6 compact summary 활용)
+   (d) PLAgent 최종 결정 — 요구사항·AC·Non-goal 작성
+   **금지**: ResearcherAgent §6의 개념·재편 요구사항을 DomainAgent §2 내부 제약과 조화시키지 않은 채
+   요구사항에 직접 복사하는 것을 금지한다. Researcher는 선택지·개념을 제공하고 PLAgent가 결정한다.
+
+4. 여섯 결과 수령 후 통합 (본 에이전트 핵심 책임)
    · FeasibilityAgent §4.2의 ADR 충돌 후보 → §3 "관련 ADR" 목록에 반영
    · ContinuityAgent §4.3의 재논의 필요 항목 → §3 충돌 ADR 확인
    · Dedup: 같은 사실·관심사를 세 에이전트가 중복 언급 시 1건 병합
    · 상충 조정: 세 관점이 다른 결론을 제시하면 근거 비교 후 판정 (불가하면 사용자 ESCALATE)
    · 공백 식별: 세 관점 모두 커버하지 못한 영역 발견 시 clarification 재스폰 또는 사용자 질의
 
-4. Clarification 재스폰 (필요 시)
+5. Clarification 재스폰 (필요 시)
    · PL이 특정 관점의 추가 조사·재해석이 필요하다고 판단하면
      → Orchestrator에 "<에이전트> 재스폰 요청" 전달 (이전 출력 pointer + clarification context 첨부)
    · Orchestrator가 해당 에이전트 신규 스폰 (one-shot 제약상 재스폰이 유일한 continuous-dialog 대체)
-   · 재스폰 결과 수령 후 3단계(통합) 반복
+   · 재스폰 결과 수령 후 4단계(통합) 반복
 
-5. PL 통합 산출물 결정
+6. PL 통합 산출물 결정
    · §2 (Domain 해석 통합 + 상충 조정) — RequirementsPLAgent가 직접 write
    · §5 (Analyst 확장) — RequirementsAnalystAgent가 직접 write
    · §6 (Researcher 외부 지식) — ResearcherAgent가 직접 write
    · §3 관련 ADR / §4 관련 코드 경로 / 상충 정합 분석 → RequirementsPLAgent가 직접 write
    · "사용자 확인 필요" 항목은 blocking wait — Orchestrator 경유 사용자 답변 전 Architect 진입 금지
 
-6. PL 산출물을 Story file에 직접 반영
+7. PL 산출물을 Story file에 직접 반영
    · Story §2 (Domain 해석 통합 + 상충 조정 분석) — RequirementsPLAgent 직접 write
    · Story §5 (Analyst 확장) — RequirementsAnalystAgent 직접 write
    · Story §6 (Researcher 외부 지식) — ResearcherAgent 직접 write
