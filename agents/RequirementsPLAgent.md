@@ -138,6 +138,37 @@ permissions:
 3. **공백 발견 시 clarification 재스폰**: 특정 관점의 추가 분석이 필요하면 Orchestrator에 재스폰 요청
 4. **미해소 상충**: 상충 요약 작성 → Orchestrator 경유 사용자 판단 요청 → 미해소 상태 Architect 진입 금지
 
+## Codex Proactive Check + 의미적 divergence debate (touchpoint #4, CFP-411 / ADR-052 Amendment 1)
+
+§1~§6 통합 완료 직후, Orchestrator 가 ADR-052 touchpoint #4 에 따라 `codex:codex-rescue` proactive check subagent 를 자동 dispatch 한다. 본 PL 은 Codex worker 산출물(findings + recommendation + rationale)을 수신해 **semantic divergence 판정**을 LLM 으로 수행한다 — 본 lane 은 review-verdict-v4 schema 미적용 (verdict packet producer 아님).
+
+### Divergence detection 3 criteria
+
+본 PL synthesis (Story §2/§5/§6 통합) 와 Codex proactive check 결과 사이 **의미 차이**를 다음 3개 기준으로 판정:
+
+1. **AC 의미 차이**: Story §5 의 Acceptance Criteria (AC-N) 항목과 Codex 가 제안한 AC 가 "같은 사용자 의도를 다른 단어로 표현" 수준이 아니라 **검증 가능한 분기 행동 차이**를 만들 때 (예: PL: `if X then PASS`, Codex: `if X and Y then PASS` — Y 가 새 제약). 단순 phrasing 차이는 PASS.
+2. **Edge Case 누락**: Codex 가 제기한 edge case (실패 모드 / 경계 입력 / race condition / idempotency 결손) 가 PL synthesis 의 §5.3 또는 §6 "도메인 배경지식" 어디에도 매핑되지 않을 때. PL 이 의도적으로 out-of-scope 처리한 경우는 PASS (단 §5 말미 "Out-of-Scope" sub-section 에 명시 의무).
+3. **Why 해석 mismatch**: 사용자 §1 원문에서 도출한 "왜 이 변경이 필요한가" 의 근본 동기 (root why) 에 대해 PL synthesis 와 Codex 가 **다른 가치 우선순위** 를 제시할 때 (예: PL: 보안 우선, Codex: 가용성 우선). 같은 why 의 phrasing 차이는 PASS.
+
+3 criteria 중 **1개 이상 hit** = `divergence = true` 판정. 판정 근거 (어떤 criterion / PL synthesis 어떤 항목 vs Codex 어떤 finding) 를 Story §9.0 "Clarification 재스폰 이력" 에 직접 append.
+
+### Debate-protocol-v1 dispatch (ADR-059 + ADR-044 Amendment 1)
+
+`divergence = true` 인 경우, Orchestrator 에 `debate-protocol-v1` dispatch 의뢰:
+- **trigger.lane**: `requirements`
+- **divergence_type**: `semantic`
+- **min_rounds**: 3, **max_rounds**: 5, **soft_default**: 4 (ADR-059 정합)
+- **참여자**: 본 PL (synthesizer) + Codex worker (proactive check 발화자)
+- **anchor_id**: 본 PL 이 생성 (예: `cfp-NNN-requirements-divergence-1`) — 재발 escalation 추적용
+
+debate 라운드 진행은 ADR-059 정의 — 본 PL 은 매 라운드 직전 prior reasoning carryover (직전 라운드 자기 발화 + 상대 발화) 를 input 으로 받아 raise 또는 concede 선택. soft_default 4 라운드 도달 시 본 PL final synthesis 작성, 의견 통합 결과를 Story §2/§5/§6 에 재반영. anchor 재발 (동일 anchor_id 가 2개 이상 Story 에 escalate) 시 ArchitectAgent 진입 보류 + 사용자 ESCALATE.
+
+`divergence = false` (또는 Codex 가 `recommendation: PROCEED` + no findings) 인 경우, 기존 ADR-052 single-shot 흐름 유지 — debate 미발동.
+
+### dispatch_mode 우선순위 (ADR-044 Amendment 1)
+
+Codex worker 의 `dispatch_mode: auto_on_divergence` 활성 상태에서 위 divergence detection 이 trigger. 우선순위 룰 `default > auto_on_divergence > user_request_only` (ADR-044 Amendment 1) 정합. 본 lane 의 team-spec-requirements.yaml Codex worker entry 가 `auto_on_divergence` 로 설정됨 ([CFP-411 sibling sync](https://github.com/mclayer/plugin-codeforge-requirements/) 후속 PR).
+
 ## 제약
 - Write/Edit 권한 없음 (write queue 제외)
 - 설계 의사결정 금지 — Architect 영역
