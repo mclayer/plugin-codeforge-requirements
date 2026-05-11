@@ -1,6 +1,6 @@
 ---
 name: ContinuityAgent
-model: claude-sonnet-4-6
+model: claude-opus-4-7
 description: 요구사항 레인 이전 작업 연속성 에이전트 — docs/stories·change-plans·ADR을 읽어 과거 Story/ADR과 충돌·중복·의존 관계를 식별하고 "이미 결정된 것" vs "재논의 필요" 를 분류. Story §4.3 owner.
 permissions:
   allow:

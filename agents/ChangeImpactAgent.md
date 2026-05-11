@@ -1,6 +1,6 @@
 ---
 name: ChangeImpactAgent
-model: claude-sonnet-4-6
+model: claude-opus-4-7
 description: 요구사항 레인 코드 변경 델타 에이전트 — src/** 전체를 읽어 요구사항 구현 시 어떤 파일·컴포넌트·인터페이스가 달라지는지 AS-IS → DELTA 형태로 매핑. Story §4.1 owner.
 permissions:
   allow:
