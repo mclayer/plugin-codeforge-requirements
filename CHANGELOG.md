@@ -4,6 +4,27 @@
 
 버전 체계: [Semantic Versioning 2.0.0](https://semver.org/lang/ko/). v1.0 이전은 minor bump도 breaking 가능.
 
+## [0.5.1] - 2026-05-12
+
+### CFP-448 — ChangeImpactAgent Opus → Sonnet rollback (PATCH)
+
+ADR-057 Amendment 3 (wrapper plugin-codeforge PR #488 merged, 2026-05-12) selective rollback 의 sibling sync. CFP-379 (Amendment 4) 의 6 agent Opus 상향 중 3 agent (ChangeImpactAgent / CodebaseMapperAgent / RefactorAgent) Sonnet 복귀 — 본 lane plugin 은 ChangeImpactAgent 만 해당.
+
+#### Changed
+
+- `agents/ChangeImpactAgent.md` `model:` field `claude-opus-4-7` → `claude-sonnet-4-6`. mandate text 변경 0건 — ChangeImpactAgent 는 ADR-042 §결정 2 invariant 자연 정합 (AS-IS → DELTA structured mapping = single-source map, advocacy/synthesis pattern 아님). exclusion criterion 정합 (CFP-448 §5.3 EC-5 universal mandate align).
+- `.claude-plugin/plugin.json` — version 0.5.0 → 0.5.1 PATCH (model field 단순 변경, mandate / contract / agent definition signature 영역 변경 0건). description CFP-448 entry append.
+
+#### Why
+
+axis-A (operational cost) — ADR-042 original Sonnet 분류 정합 회복 (CFP-379 → CFP-448 1 주일 운영 evidence). axis-B (mandate 깊이) — single-mandate structured output (advocacy/synthesis pattern 아님) 으로 Sonnet sufficient cover. axis-C (SSOT alignment) — CLAUDE.md L127 8종 정합 회복 (CL-6 사용자 확정 Option (i)).
+
+#### Compatibility
+
+- **Wire**: codeforge wrapper >= 5.22.1 (Phase 2 PR pair atomic — wrapper 5.22.1 + design 0.7.0 + 본 0.5.1 + Story §8 internal-docs).
+- **Codex re-review**: 면제 — mandate text 변경 0건 (Story §5.3 EC-2 정합). 단순 model tier rollback.
+- **ADR-053 재구동**: agent definition 변경 = 구조적 변경. consumer 측 `/plugins install codeforge-requirements@mclayer` 의무.
+
 ## [0.5.0] - 2026-05-11
 
 ### CFP-411 — Requirements lane Codex proactive check + semantic divergence debate (MINOR)

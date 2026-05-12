@@ -1,7 +1,7 @@
 {
   "name": "codeforge-requirements",
-  "version": "0.5.0",
-  "description": "codeforge 요구사항 레인 — RequirementsPLAgent + DomainAgent + RequirementsAnalyst + ResearcherAgent + ChangeImpactAgent + FeasibilityAgent + ContinuityAgent + codex-proactive-check. 7-way 병렬 관점 통합 (기존 4 + 코드 컨텍스트 3) + Codex worker proactive check. Domain Knowledge + Story §2/§5/§6/§4.1/§4.2/§4.3 self-write. codeforge core 의존. + CFP-379 RequirementsPLAgent·DomainAgent·RequirementsAnalyst·ResearcherAgent·ChangeImpactAgent·FeasibilityAgent·ContinuityAgent Opus 승격 (ADR-042 Amendment 4, ADR-057, 2026-05-11). + CFP-411 RequirementsPLAgent semantic divergence detection 3 criteria + codex-proactive-check worker 신설 (dispatch_mode auto_on_divergence) + ADR-052 Amendment 1 touchpoint #4 multi-round debate 격상 (ADR-059, 2026-05-11).",
+  "version": "0.5.1",
+  "description": "codeforge 요구사항 레인 — RequirementsPLAgent + DomainAgent + RequirementsAnalyst + ResearcherAgent + ChangeImpactAgent + FeasibilityAgent + ContinuityAgent + codex-proactive-check. 7-way 병렬 관점 통합 (기존 4 + 코드 컨텍스트 3) + Codex worker proactive check. Domain Knowledge + Story §2/§5/§6/§4.1/§4.2/§4.3 self-write. codeforge core 의존. + CFP-379 RequirementsPLAgent·DomainAgent·RequirementsAnalyst·ResearcherAgent·ChangeImpactAgent·FeasibilityAgent·ContinuityAgent Opus 승격 (ADR-042 Amendment 4, ADR-057, 2026-05-11). + CFP-411 RequirementsPLAgent semantic divergence detection 3 criteria + codex-proactive-check worker 신설 (dispatch_mode auto_on_divergence) + ADR-052 Amendment 1 touchpoint #4 multi-round debate 격상 (ADR-059, 2026-05-11). + CFP-448 ChangeImpactAgent model Opus → Sonnet (ADR-057 Amendment 3 selective rollback, mandate text 변경 0건 — exclusion criterion 정합, 2026-05-12).",
   "author": {
     "name": "Josh"
   },
