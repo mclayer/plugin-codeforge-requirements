@@ -1,6 +1,6 @@
 ---
 name: FeasibilityAgent
-model: claude-opus-4-7
+model: claude-sonnet-4-6
 description: 요구사항 레인 구현 가능성 평가 에이전트 — src/** + ADR을 읽어 현재 아키텍처에서 요구사항이 자연스럽게 구현 가능한지 판단하고 설계 레인 경고 힌트를 생성. Story §4.2 owner.
 permissions:
   allow:

@@ -4,6 +4,38 @@
 
 버전 체계: [Semantic Versioning 2.0.0](https://semver.org/lang/ko/). v1.0 이전은 minor bump도 breaking 가능.
 
+## [0.6.1] - 2026-05-13
+
+### CFP-264 — FeasibilityAgent · ContinuityAgent model Opus → Sonnet (PATCH)
+
+ADR-057 Amendment 4 + ADR-042 Amendment 6 cross-ref atomic. **path B 정합** (Codex proactive check touchpoint #4 권장 + 사용자 CL-1 확정): ResearcherAgent 제외, 3종 (Feasibility / Continuity / ChangeImpact) Sonnet 다운. ChangeImpactAgent 는 CFP-448 wave 에서 이미 Sonnet (sibling 측 NO-OP) → 본 PR 실제 변경 = 2 agent file (Feasibility / Continuity).
+
+#### Changed
+
+- `agents/FeasibilityAgent.md` (UPDATE line 3) — `model: claude-opus-4-7` → `claude-sonnet-4-6`. mandate text 변경 0건 — ADR-042 §결정 1 Sonnet (a) single-mandate advocacy 정합 (구현 가능성 등급 + 경고 힌트, supervisor synthesis 영역 아님).
+- `agents/ContinuityAgent.md` (UPDATE line 3) — `model: claude-opus-4-7` → `claude-sonnet-4-6`. mandate text 변경 0건 — ADR-042 §결정 1 Sonnet (a) single-mandate advocacy 정합 (충돌/중복/의존 분류, cross-Story pattern detection 영역 아님 — 본 lane 단일 Story 안 기존 ADR/Story cross-ref만 수행).
+- `.claude-plugin/plugin.json` — version 0.6.0 → 0.6.1 PATCH (main advance rebase 후 재bump, agent file model field 변경 + mandate text 변경 0건, ADR-037 PATCH 정합). description CFP-264 entry append.
+
+#### NO-OP (already-Sonnet evidence)
+
+- `agents/ChangeImpactAgent.md` — main branch 이미 `model: claude-sonnet-4-6` (CFP-448 sibling commit c4084d8). path B 정합 결과 = sibling 측 변경 0건, SSOT 측 갱신만.
+
+#### Path B rationale (Codex proactive check touchpoint #4)
+
+- ADR-046 §결정 4 verbatim ("Sonnet 대수 불가 — deep concept reasoning 책임") + §결정 5 동일 + §결과 §긍정 ("Sonnet 대수 가능성 제거") — ResearcherAgent Sonnet 다운 자체가 ADR 본문 핵심 정책 reject 영역. 따라서 본 Story scope 에서 Researcher 제외.
+- ADR-046 변경 0건 (path B 정합 invariant).
+
+#### Why
+
+CFP-448 (axis-A operational cost trade-off) 의 reverse direction 2차 evidence — selective rollback 패턴 확장 (CFP-448 = 3 agent Sonnet rollback, 본 CFP-264 = 2 agent 추가 Sonnet rollback). 사용자 §1 verbatim 의 "토큰이 너무 많이 쓰여서 opus를 조금 보수적으로 써야겠다" framing 직접 적용 + ADR-042 §결정 1 Sonnet (a) single-mandate advocacy criteria 회귀.
+
+#### Compatibility
+
+- **Wire**: 영향 0건 — agent name / permissions / description 변경 0건, model field 만 변경.
+- **In-flight Story**: 본 PR merge 후 첫 spawn 부터 Sonnet 운영 — Sonnet → Opus rate-limit fallback (ADR-057 §결정 2) 자동 적용 보호.
+- **wrapper sibling**: ADR-042 Amendment 6 + ADR-057 Amendment 4 + CLAUDE.md L130 mirror + `scripts/measure-rate-limit-fallback.sh` SONNET_AGENTS 배열 11종 (8 + 3 신규: Feasibility / Continuity / ChangeImpact) 동시 갱신 의무 (atomic cross-ref). wrapper version 5.28.0 → 5.29.0 MINOR (main advance rebase 후 재bump).
+- **marketplace sync**: ADR-063 atomic invariant — wrapper + requirements bump 정합 marketplace.json mirrored field sync PR follow-up.
+
 ## [0.6.0] - 2026-05-13
 
 ### CFP-510 — RequirementsPLAgent divergence detection 4 영역 확장 (MINOR)
