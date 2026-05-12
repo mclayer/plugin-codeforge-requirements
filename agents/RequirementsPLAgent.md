@@ -138,25 +138,49 @@ permissions:
 3. **공백 발견 시 clarification 재스폰**: 특정 관점의 추가 분석이 필요하면 Orchestrator에 재스폰 요청
 4. **미해소 상충**: 상충 요약 작성 → Orchestrator 경유 사용자 판단 요청 → 미해소 상태 Architect 진입 금지
 
-## Codex Proactive Check + 의미적 divergence debate (touchpoint #4, CFP-411 / ADR-052 Amendment 1)
+## Codex Proactive Check + divergence debate (touchpoint #4, CFP-411 / ADR-052 Amendment 1 + CFP-510 / Amendment 3)
 
-§1~§6 통합 완료 직후, Orchestrator 가 ADR-052 touchpoint #4 에 따라 `codex:codex-rescue` proactive check subagent 를 자동 dispatch 한다. 본 PL 은 Codex worker 산출물(findings + recommendation + rationale)을 수신해 **semantic divergence 판정**을 LLM 으로 수행한다 — 본 lane 은 review-verdict-v4 schema 미적용 (verdict packet producer 아님).
+§1~§6 통합 완료 직후, Orchestrator 가 ADR-052 touchpoint #4 에 따라 `codex:codex-rescue` proactive check subagent 를 자동 dispatch 한다. 본 PL 은 Codex worker 산출물(findings + recommendation + rationale)을 수신해 **divergence 판정**을 LLM 으로 수행한다 — 본 lane 은 review-verdict-v4 schema 미적용 (verdict packet producer 아님). divergence 영역 = 3 semantic + 1 factual = 4 영역 (Amendment 3 / CFP-510).
 
-### Divergence detection 3 criteria
+### Divergence detection 4 영역 (3 semantic + 1 factual)
 
-본 PL synthesis (Story §2/§5/§6 통합) 와 Codex proactive check 결과 사이 **의미 차이**를 다음 3개 기준으로 판정:
+본 PL synthesis (Story §2/§5/§6 통합) 와 Codex proactive check 결과 사이 차이를 다음 4 영역으로 판정:
+
+**Semantic 3 criteria (Amendment 1 SSOT 보존)**:
 
 1. **AC 의미 차이**: Story §5 의 Acceptance Criteria (AC-N) 항목과 Codex 가 제안한 AC 가 "같은 사용자 의도를 다른 단어로 표현" 수준이 아니라 **검증 가능한 분기 행동 차이**를 만들 때 (예: PL: `if X then PASS`, Codex: `if X and Y then PASS` — Y 가 새 제약). 단순 phrasing 차이는 PASS.
 2. **Edge Case 누락**: Codex 가 제기한 edge case (실패 모드 / 경계 입력 / race condition / idempotency 결손) 가 PL synthesis 의 §5.3 또는 §6 "도메인 배경지식" 어디에도 매핑되지 않을 때. PL 이 의도적으로 out-of-scope 처리한 경우는 PASS (단 §5 말미 "Out-of-Scope" sub-section 에 명시 의무).
 3. **Why 해석 mismatch**: 사용자 §1 원문에서 도출한 "왜 이 변경이 필요한가" 의 근본 동기 (root why) 에 대해 PL synthesis 와 Codex 가 **다른 가치 우선순위** 를 제시할 때 (예: PL: 보안 우선, Codex: 가용성 우선). 같은 why 의 phrasing 차이는 PASS.
 
-3 criteria 중 **1개 이상 hit** = `divergence = true` 판정. 판정 근거 (어떤 criterion / PL synthesis 어떤 항목 vs Codex 어떤 finding) 를 Story §9.0 "Clarification 재스폰 이력" 에 직접 append.
+**Factual 1 criterion (Amendment 3 신설 — CFP-510)**:
+
+4. **Fact-check**: PL synthesis 의 사실 claim (registry entry status / 이전 PR leak / file path / cross-repo state) 이 Codex 가 read-only verify 한 사실과 불일치할 때. Sub-criteria 4종:
+   - **registry-execution drift**: PL 인용 registry entry status (예: tier / status / version) 가 실제 yaml/json 파일 상태와 불일치
+   - **pre-existing leak**: PL 이 "신규 발견" 으로 분류한 항목이 이전 PR / 이전 Story 에 이미 leak 된 상태 (audit carrier vs fix carrier 분류 오류)
+   - **file path verification**: PL 인용 file path / line / 함수명이 실제 코드베이스 상태와 불일치 (rename / move / 삭제)
+   - **cross-repo state verification**: PL 인용 sibling plugin version / contract sibling sync status / marketplace.json mirrored field 가 실제 cross-repo HEAD 와 불일치
+
+4 영역 중 **1개 이상 hit** = `divergence = true` 판정. divergence_type 분류 = semantic 3 영역 hit 시 `semantic`, factual 4번째 영역 hit 시 `factual` (debate-protocol-v1 enum 확장 carrier 가 separate CFP — 임시 polyfill 시점은 `semantic` + Story §9.0 sub-tag `[factual]`). 판정 근거 (어떤 criterion / PL synthesis 어떤 항목 vs Codex 어떤 finding) 를 Story §9.0 "Clarification 재스폰 이력" 에 직접 append.
+
+### PL self-evaluation 의무 — fact claim marker 5종 (ADR-052 Amendment 3 §A3·§A4)
+
+PL 이 §2/§5/§6 synthesis 작성 시 fact claim 영역에 다음 5종 marker 중 1종 의무 부착 — fact-check 영역 divergence detection false negative 차단 forcing function:
+
+| Marker | 의미 | 후속 동작 |
+|---|---|---|
+| `[verified]` | PL 이 직접 Read/Glob/Bash 로 검증 완료 | 검증 evidence 1-line 인용 의무 (file:line 형식) |
+| `[hypothesis]` | PL 이 추론한 가설 (검증 미수행) | Codex proactive check 가 verify 의무 — divergence detection 4번째 영역 trigger 가능 |
+| `[fact-check-pending]` | 검증 의도는 있으나 본 turn 에서 미완료 | Codex worker 결과 수신 후 PL 이 즉시 verify + marker 갱신 의무 |
+| `[user-input]` | 사용자 §1 원문 verbatim — 검증 대상 외 | 변조 금지 invariant (story-section-1-immutable.yml SSOT) |
+| `[verification-out-of-scope: <사유>]` | 도구 한계로 검증 불가 (외부 API state / runtime measurement 등) | 사유 필드 verbatim 의무. divergence detection 4번째 영역 hit 면제 (false positive 차단) |
+
+Marker 부재 = 암묵적 `[hypothesis]` (안전 방향 default). consumer overlay 로 marker 어휘 변경 불가 (ADR-064 §결정 7 top-down ratchet 정합).
 
 ### Debate-protocol-v1 dispatch (ADR-059 + ADR-044 Amendment 1)
 
 `divergence = true` 인 경우, Orchestrator 에 `debate-protocol-v1` dispatch 의뢰:
 - **trigger.lane**: `requirements`
-- **divergence_type**: `semantic`
+- **divergence_type**: `semantic` (3 semantic criteria hit) 또는 `factual` (4번째 영역 hit, 임시 polyfill = `semantic` + sub-tag `[factual]`)
 - **min_rounds**: 3, **max_rounds**: 5, **soft_default**: 4 (ADR-059 정합)
 - **참여자**: 본 PL (synthesizer) + Codex worker (proactive check 발화자)
 - **anchor_id**: 본 PL 이 생성 (예: `cfp-NNN-requirements-divergence-1`) — 재발 escalation 추적용

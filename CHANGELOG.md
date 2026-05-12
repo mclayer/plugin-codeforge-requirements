@@ -4,6 +4,27 @@
 
 버전 체계: [Semantic Versioning 2.0.0](https://semver.org/lang/ko/). v1.0 이전은 minor bump도 breaking 가능.
 
+## [0.6.0] - 2026-05-13
+
+### CFP-510 — RequirementsPLAgent divergence detection 4 영역 확장 (MINOR)
+
+wrapper plugin-codeforge ADR-052 Amendment 3 sibling sync. CFP-411 (Amendment 1) 의 semantic 3 criteria 에 **4번째 영역 = fact-check** 추가. PL self-evaluation 의무 = synthesis fact claim 영역 marker 5종 (`[verified]` / `[hypothesis]` / `[fact-check-pending]` / `[user-input]` / `[verification-out-of-scope: <사유>]`). MINOR bump (mandate text 영역 확장 — agent definition signature 영역).
+
+#### Changed
+
+- `agents/RequirementsPLAgent.md` — "Divergence detection 3 criteria" → "Divergence detection 4 영역 (3 semantic + 1 factual)" 단락 확장 + "PL self-evaluation 의무 — fact claim marker 5종" 단락 신설 + Debate-protocol-v1 dispatch divergence_type 분류 (semantic / factual + polyfill) 명시.
+- `agents/codex-proactive-check.md` — "dispatch_mode: auto_on_divergence" 단락 divergence 4 영역 명시 + "Fact-check 영역 (ADR-052 Amendment 3 / CFP-510)" 단락 신설 (4 sub-criteria 검증 방법 표 + PL marker 5종 인지 의무).
+- `.claude-plugin/plugin.json` — version 0.5.1 → 0.6.0 MINOR. description CFP-510 entry append.
+
+#### Why
+
+axis-A (mandate 영역 확장 — fact-check 영역 명시): semantic 3 criteria implicit 영역 → 4 영역 explicit normative anchor. axis-B (PL synthesis quality — marker 5종 forcing function): 가설 vs verified 영역 구분 의무 부재 → false negative 차단. axis-C (Codex worker mandate 정합): codex-proactive-check.md 가 RequirementsPLAgent marker 5종 cross-verify 의무 명시.
+
+#### Compatibility
+
+- canonical: wrapper `plugin-codeforge` 5.24.0 (PR Phase 1 sibling sync — ADR-010 §단계 절차 wrapper-first 정합)
+- Effective date: 본 PR merged + marketplace sync PR merged + consumer `/plugins install` 후 (ADR-053 structural change restart 적용 영역)
+
 ## [0.5.1] - 2026-05-12
 
 ### CFP-448 — ChangeImpactAgent Opus → Sonnet rollback (PATCH)
