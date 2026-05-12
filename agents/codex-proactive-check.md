@@ -38,7 +38,22 @@ Orchestrator inline dispatch — packet schema 는 wrapper [`docs/orchestrator-p
 
 ## dispatch_mode: auto_on_divergence (ADR-044 Amendment 1)
 
-본 worker 는 `auto_on_divergence` 활성 상태로 spawn. RequirementsPLAgent 가 본 worker 산출물과 자기 synthesis 사이 **semantic divergence** (3 criteria: AC 의미 차이 / Edge Case 누락 / why 해석 mismatch) 판정 시 자동으로 `debate-protocol-v1` dispatch 됨. divergence 미검출 시 single-shot 흐름 유지 (기존 ADR-052 동작 보존).
+본 worker 는 `auto_on_divergence` 활성 상태로 spawn. RequirementsPLAgent 가 본 worker 산출물과 자기 synthesis 사이 divergence (4 영역: 3 semantic + 1 factual — AC 의미 차이 / Edge Case 누락 / Why 해석 mismatch / Fact-check) 판정 시 자동으로 `debate-protocol-v1` dispatch 됨. divergence 미검출 시 single-shot 흐름 유지 (기존 ADR-052 동작 보존).
+
+### Fact-check 영역 (ADR-052 Amendment 3 / CFP-510)
+
+본 worker 는 PL synthesis 의 사실 claim 영역도 read-only verify 한다 — 4 sub-criteria:
+
+| Sub-criterion | 검증 방법 |
+|---|---|
+| **registry-execution drift** | `Read` + `Grep` (registry yaml entry status 실측) |
+| **pre-existing leak** | `Bash(codex exec *)` 내 `gh search code` / `gh pr list` / `git log -S` |
+| **file path verification** | `Glob` + `Read` (path / line / 함수명 실측) |
+| **cross-repo state verification** | `Bash(codex exec *)` 내 `gh api repos/*/contents/*` + `Read` (sibling plugin / contract / marketplace.json mirrored field 실측) |
+
+발견된 fact 불일치 = `findings[]` 에 `severity: major` 이상 + description 에 sub-criterion 명시 의무 (예: `[fact-check: registry-execution drift] ADR-060 §결정 5 인용 tier=warning 인데 실제 entry.current_tier=blocking-on-pr`).
+
+PL synthesis 의 fact claim marker (`[verified]` / `[hypothesis]` / `[fact-check-pending]` / `[user-input]` / `[verification-out-of-scope: <사유>]`) 5종 인지 의무 — `[verified]` marker 부착 claim 검증 시 PL 인용 evidence line 까지 cross-verify, `[verification-out-of-scope: <사유>]` 마커는 fact-check sub-criteria 면제.
 
 우선순위 룰: `default > auto_on_divergence > user_request_only` (ADR-044 Amendment 1).
 
