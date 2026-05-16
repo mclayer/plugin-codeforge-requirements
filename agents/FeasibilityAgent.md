@@ -115,6 +115,30 @@ section: "4.2"
 
 본 agent 는 codeforge-requirements `CLAUDE.md` self-write 표가 정의하는 path 만 직접 write.
 
+## 재조사 수신부 (ADR-077 §결정 1/2/7)
+
+본 SubAgent 가 강제 재조사 fan-out dispatch 수신 시:
+1. 공통 입력 packet 신규 수령 (RequirementsPLAgent 가 coalesce 완료 후 단일 dispatch).
+2. 담당 섹션 (§4.2 Feasibility) fresh 재작성. stale 마킹 해제 = RequirementsPL 영역.
+3. **정보 무결성 invariant (ADR-077 §결정 7)**: prior_output_ref fact-check marker **5종** (`[verified]` / `[hypothesis]` / `[fact-check-pending]` / `[user-input]` / `[verification-out-of-scope: <사유>]`) verbatim 보존. `[hypothesis]` / `[fact-check-pending]` → `[verified]` **무검증 승격 금지** (직접 재검증 + evidence file:line 인용 시만). 승격 비대칭: lower → higher 무검증 금지 / higher → lower 강등 허용 (보수 안전). marker SSOT = ADR-052 Amendment 3 §A3.
+4. **INV-IDEM cross-ref**: 재조사 stale 전이 = ADR-077 §결정 8 INV-IDEM-3/4 / coalesce 멱등성 = §결정 4 INV-IDEM-1/2 따른다. 평문 재정의 금지.
+5. §9.0 owner = RequirementsPL (`recheck_N | <본 agent 이름> | <triggering_answer_ref>` 행 append). 본 SubAgent 직접 기록 금지.
+6. 결과 write queue 제출 (`.claude-work/doc-queue/<story>/<seq>-story-section-4.2.md`).
+
+### ESCALATE 수신 (counter boundary D4)
+
+`recheck_counter` 6 진입 = cap 초과 = circuit open. RequirementsPL 이 ESCALATE 판정 → 본 SubAgent 진행 중단 + 현 상태 그대로 partial 반환 (fail-closed — ADR-077 §결정 8 INV-IDEM-4).
+
+## design-reading 깊이 강화 mandate (ADR-077 §결정 3)
+
+재조사 수행 시 설계 문서 (Change Plan / ADR / playbook) **skim 금지** — 설계 **의도 + 근거 파악** 의무.
+
+- skim 금지: 헤더/제목 스캔 → 표면 요약 작성 행동 차단.
+- 의도 파악: 해당 설계 결정의 "왜" (trade-off / constraint / rationale) 이해 후 담당 섹션 산출에 반영.
+- 근거 파악: Change Plan §3 D 판정 + ADR §결정 본문 + Story §2 도메인 제약 cross-ref 독해.
+
+**적용 범위**: ADR-077 §결정 3 명시 3 SubAgent = ChangeImpactAgent / FeasibilityAgent / ContinuityAgent (본 SubAgent 포함). mechanical 깊이 판정 기준·수치 = P-6 설계 lane 위임 (본 mandate = normative 선언 + 3 SubAgent 명시까지만).
+
 ---
 
 ## CFP-374 — Operating environment v44 (ADR-044 phase-scoped sequential team)

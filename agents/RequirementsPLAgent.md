@@ -74,10 +74,7 @@ permissions:
    · 공백 식별: 세 관점 모두 커버하지 못한 영역 발견 시 clarification 재스폰 또는 사용자 질의
 
 5. Clarification 재스폰 (필요 시)
-   · PL이 특정 관점의 추가 조사·재해석이 필요하다고 판단하면
-     → Orchestrator에 "<에이전트> 재스폰 요청" 전달 (이전 출력 pointer + clarification context 첨부)
-   · Orchestrator가 해당 에이전트 신규 스폰 (one-shot 제약상 재스폰이 유일한 continuous-dialog 대체)
-   · 재스폰 결과 수령 후 4단계(통합) 반복
+   > clarification 답변 수령 시 재조사 절차 = `## 재조사 수신부 (ADR-077 §결정 1)` SSOT — PL재량 게이트 폐기 (ADR-077 §결정 1 적용).
 
 6. PL 통합 산출물 결정
    · §2 (Domain 해석 통합 + 상충 조정) — RequirementsPLAgent가 직접 write
@@ -210,6 +207,8 @@ Codex worker 의 `dispatch_mode: auto_on_divergence` 활성 상태에서 위 div
 
 PL 이 통합 중 sub-agent 의 추가 분석·재해석을 요청해 Orchestrator 경유 재스폰 의뢰 시, 재스폰 사유·재질의 context 를 `docs/stories/<KEY>.md §9.0 "Clarification 재스폰 이력"` 에 PL 이 직접 append (`Edit(docs/stories/**)` 권한). §10 FIX Ledger 와 분리 — 재스폰은 게이트 실패 아니므로 GitHub `fix:*` 라벨 미부착.
 
+재조사 카운터 = §9.0 (owner = RequirementsPL, `fix:*` 라벨 미부착, `recheck_counter` SSOT). §10 FIX Ledger (Orchestrator monopoly, fix-event-v1 `Iter` 합산) 와 **물리 disjoint** — 합산 금지. SSOT cross-ref = ADR-077 §결정 5 (4-layer counter disjoint).
+
 ## 문서화 표준
 
 본 agent 는 자기 lane 의 self-write 표 (codeforge-requirements `CLAUDE.md` `Self-write 책임` 표) 가 정의하는 path 만 직접 write. 그 외 docs/** + GitHub Issue/PR 인터페이스는 codeforge wrapper Orchestrator 가 처리. 형식·prefix 표는 wrapper [CLAUDE.md](https://github.com/mclayer/plugin-codeforge/blob/main/CLAUDE.md) "오케스트레이션 규칙" 참조.
@@ -261,3 +260,39 @@ PL 이 통합 중 sub-agent 의 추가 분석·재해석을 요청해 Orchestrat
 - canonical PR #21 (merged): https://github.com/mclayer/plugin-codeforge-review/pull/21
 - internal-docs PR #101 (merged): https://github.com/mclayer/codeforge-internal-docs/pull/101
 - ADR-010 §4 wrapper-first allowed pattern (sibling sync legitimacy)
+
+## 재조사 수신부 (ADR-077 §결정 1/2)
+
+clarification 답변 수령 시 **무조건 6-SubAgent fan-out** (게이트 0 — value-equality skip 비차용, ADR-077 §결정 1).
+
+### Fan-out 대상 (정확히 6 permanent, AC-2)
+
+DomainAgent / RequirementsAnalystAgent / ResearcherAgent / ChangeImpactAgent / FeasibilityAgent / ContinuityAgent.
+
+### 병렬 의무 (ADR-064 §결정 4 / ADR-077 §결정 10 — AC-3)
+
+parallel always-executable. sequential 선택 = state dependency / shared resource / ordering invariant 3 사유 중 1 명시 의무.
+
+### Burst coalesce 수신
+
+재조사 envelope (debounce / max-wait / coalesce / recheck_counter_cap / max_total_recheck_spawns) 정량값 = **ADR-077 §결정 4 정량 표 SSOT cross-ref**. 본 prose **평문 박제 금지** (D3 P0 — SSOT 다중화 + ratchet drift 차단, playbook §4.4.1 step 2 precedent). env=0 / env=1 정량 분기 표현 0건 (D3 P1, ADR-044 §결정 8 env-invariant).
+
+### Counter boundary semantics (D4 normative)
+
+`recheck_counter == 5` = 5번째 정상 재조사 사이클 (정상 scope 정교화). `recheck_counter` 가 6 으로 증가 진입 = `cap 초과` = circuit open → ESCALATE (`escalation_class: scope_redefinition_required`, `recheck_counter` RESET to 0). 즉 5번째 재조사 = 정상 완료, 6번째 trigger 시점 = circuit open (ADR-077 §결정 6 "초과" strictly-greater-than).
+
+### 조건부 PMO 합류 판정 (P-5 closed enum)
+
+`activation_condition: epic_structure_change` (P-5 closed enum key, ADR-077 §결정 2). env=0 판정 주체 = **Orchestrator** (playbook §4.4.1 step 4 owner). RequirementsPL = P-5 매칭 신호만 synthesis 에 declare, 최종 spawn = Orchestrator monopoly (ADR-039 정합). `contrapositive_invariant: "PMO 합류 미발동 = Epic 구조 무변경"` (ADR-064 §결정 1 forbid-list 모달 어휘 금지 — mechanical anchor).
+
+### Stale 마킹 declare
+
+재조사 trigger 시 이전 §2/§4.1/§4.2/§4.3/§5/§6 산출 stale 마킹. stale recovery 기준 = P-3 설계 lane 후속 위임.
+
+### INV-IDEM cross-ref (D6 MUST NOT 평문 재정의)
+
+재조사 stale 전이 = ADR-077 §결정 8 INV-IDEM-3 (monotonic generation guard) / §결정 8 INV-IDEM-4 (partial-failure fail-closed) 따른다. coalesce 멱등성 = ADR-077 §결정 4 INV-IDEM-1 (재조사 결과 멱등) / INV-IDEM-2 (coalesce 결정성) 따른다.
+
+### 정보 무결성 invariant (ADR-077 §결정 7, D2 canonical wording)
+
+강제 재조사 fan-out 재스폰 시 수신한 `prior_output_ref` (이전 §2/§4.1/§4.2/§4.3/§5/§6 산출) 의 fact-check marker **5종** (`[verified]` / `[hypothesis]` / `[fact-check-pending]` / `[user-input]` / `[verification-out-of-scope: <사유>]`) 을 **verbatim 보존**한다. `[hypothesis]` / `[fact-check-pending]` 을 `[verified]` 로 **무검증 승격 금지** — 직접 재검증 + evidence file:line 인용 시에만 승격 허용. marker 부재 = 암묵 `[hypothesis]` default 유지. reverse-explicit `[verification-out-of-scope: <사유>]` 사유 필드 verbatim 보존. marker SSOT = ADR-052 Amendment 3 §A3, consumer overlay 변경 불가 (ADR-064 §결정 7 top-down ratchet). **승격 비대칭**: lower → higher 무검증 금지 / higher → lower (`[verified]` → `[hypothesis]`) 강등 허용 (보수 안전 방향).

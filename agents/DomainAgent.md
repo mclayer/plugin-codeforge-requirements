@@ -189,6 +189,20 @@ title: <페이지 제목>          # 본문 H1
 
 본 agent 는 자기 lane 의 self-write 표 (codeforge-requirements `CLAUDE.md` `Self-write 책임` 표) 가 정의하는 path 만 직접 write. 그 외 docs/** + GitHub Issue/PR 인터페이스는 codeforge wrapper Orchestrator 가 처리. 형식·prefix 표는 wrapper [CLAUDE.md](https://github.com/mclayer/plugin-codeforge/blob/main/CLAUDE.md) "오케스트레이션 규칙" 참조.
 
+## 재조사 수신부 (ADR-077 §결정 1/2/7)
+
+본 SubAgent 가 강제 재조사 fan-out dispatch 수신 시:
+1. 공통 입력 packet 신규 수령 (RequirementsPLAgent 가 coalesce 완료 후 단일 dispatch).
+2. 담당 섹션 (§2 Domain) fresh 재작성. stale 마킹 해제 = RequirementsPL 영역.
+3. **정보 무결성 invariant (ADR-077 §결정 7)**: prior_output_ref fact-check marker **5종** (`[verified]` / `[hypothesis]` / `[fact-check-pending]` / `[user-input]` / `[verification-out-of-scope: <사유>]`) verbatim 보존. `[hypothesis]` / `[fact-check-pending]` → `[verified]` **무검증 승격 금지** (직접 재검증 + evidence file:line 인용 시만). 승격 비대칭: lower → higher 무검증 금지 / higher → lower 강등 허용 (보수 안전). marker SSOT = ADR-052 Amendment 3 §A3.
+4. **INV-IDEM cross-ref**: 재조사 stale 전이 = ADR-077 §결정 8 INV-IDEM-3/4 / coalesce 멱등성 = §결정 4 INV-IDEM-1/2 따른다. 평문 재정의 금지.
+5. §9.0 owner = RequirementsPL (`recheck_N | <본 agent 이름> | <triggering_answer_ref>` 행 append). 본 SubAgent 직접 기록 금지.
+6. 결과 write queue 제출 (`.claude-work/doc-queue/<story>/<seq>-story-section-2.md`).
+
+### ESCALATE 수신 (counter boundary D4)
+
+`recheck_counter` 6 진입 = cap 초과 = circuit open. RequirementsPL 이 ESCALATE 판정 → 본 SubAgent 진행 중단 + 현 상태 그대로 partial 반환 (fail-closed — ADR-077 §결정 8 INV-IDEM-4).
+
 ---
 
 ## CFP-137 Wave 2 — Operating environment v44 (ADR-044 phase-scoped sequential team)
