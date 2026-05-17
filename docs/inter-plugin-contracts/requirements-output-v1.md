@@ -1,6 +1,6 @@
 ---
 kind: contract
-contract_version: "1.0"
+contract_version: "1.1"
 status: Active
 related_plugins:
   - codeforge (wrapper, consumer)
@@ -8,6 +8,7 @@ related_plugins:
 related_adrs:
   - ADR-008 (Inter-plugin Contract Versioning)
   - ADR-009 (Wrapper-only core + writer-distributed lane plugins)
+  - ADR-077 (Clarification 강제 재조사 정책 — §결정 5 carrier: recheck_counter typed surface = 4-layer disjoint 3번째 cross-declare 위치)
 authors:
   - CFP-37 ζ arc — Requirements lane extraction (2026-04-29)
 ---
@@ -75,7 +76,7 @@ requirements_packet:
 
 ```yaml
 requirements_output:
-  contract_version: "1.0"
+  contract_version: "1.1"           # CFP-834: 1.0 → 1.1 MINOR (optional 필드 추가)
   story_key: <STORY_KEY>
 
   status: PASS | ESCALATE_USER_CLARIFICATION | ESCALATE_PACKET_INCOMPLETE  # 필수
@@ -143,6 +144,47 @@ epic_dependencies:                    # OPTIONAL — empty list if independent
 - v1.1 consumer 가 default `[]` / `null` 로 처리
 - 기존 Story 영향 X — 신규 Story 만 optional 사용
 
+## 3.2 재조사 카운터 typed surface (recheck_counter, v1.1)
+
+# CFP-834 / ADR-077 §결정 5 carrier. requirements_output 본문에 reinvestigation_tracking
+# top-level block 추가 (optional, backward compatible — ADR-008 §결정 2 MINOR).
+#
+# 4-layer disjoint cross-declare 위치 (cross-ref only — 본문 재선언 금지):
+#   본 surface = 4-layer disjoint counter 의 3번째 cross-declare 위치
+#   (1 = ADR-077 §결정 5 + §결과 절 / 2 = playbook §4.4.0 표 / 3 = 본 schema).
+#   cross-pollinate 금지 (ADR-077 §결정 5 normative). 1·2번째 본문 재선언 금지.
+
+```yaml
+requirements_output:
+  contract_version: "1.1"           # CFP-834: 1.0 → 1.1 MINOR (optional 필드 추가)
+  # ... (기존 §3 필드 불변: status / sub_agent_results / writes_completed / user_clarification_needed)
+
+  reinvestigation_tracking:         # OPTIONAL — clarification-driven 재조사 누적 forward 신호
+    optional: true                  # ADR-008 §결정 2 MINOR — consumer v1.0 채 못 받아도 no-op
+    recheck_counter: <int>          # cross-cycle 누적. default 0 (absent ≡ 0)
+                                    # cap SSOT = ADR-077 §결정 4 표 P-2 recheck_counter_cap
+                                    # (평문 박제 금지 — cross-ref only, DC-3)
+    recheck_status: accumulating | cap_reached   # enum (D6)
+                                    # accumulating: 0 <= recheck_counter < cap
+                                    # cap_reached:  recheck_counter == cap → ESCALATE
+                                    #   escalation_class: scope_redefinition_required
+                                    #   (ADR-077 §결정 6 cross-ref — NOT failure/abort)
+                                    #   ESCALATE 후 recheck_counter RESET to 0 (새 baseline)
+    owner: RequirementsPL           # Story §9.0 self-write (fix:* 라벨 미부착)
+
+  # disjoint invariant (cross-ref only — ADR-077 §결정 5):
+  #   - recheck_counter ≠ §10 FIX Ledger row (fix-event-v1 미공유 구조)
+  #   - §10 합산 금지 (ADR-067 cross-lane 합산 금지) — cap_reached → ESCALATE 도
+  #     §10 FIX Ledger 미기록 (ADR-077 §결정 6 §10 무기록 정합)
+  #   - 정보 무결성 (ADR-077 §결정 7 cross-ref): 재조사가 직전 cycle
+  #     [hypothesis]/[fact-check-pending] marker 를 무검증 [verified] 승격 금지
+```
+
+**계약 불변식 요약**:
+- `reinvestigation_tracking` block 부재 = `recheck_counter` 암묵 `0` + `recheck_status: accumulating` (backward-compat default, DataMigrationArch INV-4).
+- `recheck_status: cap_reached` ⟺ `recheck_counter == cap` (ADR-077 §결정 4 P-2 SSOT) → consumer 는 contract 해석으로 ESCALATE 인지 (AC-8.2).
+- `cap` 정량값 = schema 본문 평문 금지 — `ADR-077 §결정 4 표 P-2 recheck_counter_cap` cross-ref only (DC-3).
+
 ## 4. ESCALATE 처리
 
 - **ESCALATE_USER_CLARIFICATION**: Analyst 가 user 원문 ambiguity 해결 불가. PL 이 specific 질문 list 반환 → Orchestrator 가 user 에게 전달
@@ -153,6 +195,7 @@ epic_dependencies:                    # OPTIONAL — empty list if independent
 - 새 sub-agent 추가 (예: ComplianceAnalyst) — sub_agent_results schema 확장 minor (v1.1)
 - 새 ESCALATE enum 추가 — minor
 - writes_completed 필드 schema 확장 — minor
+- reinvestigation_tracking 확장 (recheck_counter 파생 필드 추가) — minor (CFP-834: v1.0 → v1.1 기존 진화 경로 정합)
 
 ## 6. 본 contract 시점 동결 ATTRIBUTION
 
